@@ -3,7 +3,7 @@ title L2-Scripts (Auth Server)
 :start
 echo Starting AuthServer.
 echo.
-java -server -Dfile.encoding=UTF-8 -Xms64m -Xmx64m -cp config;./lib/* l2s.authserver.AuthServer
+java -server -Dfile.encoding=UTF-8 -Xms64m -Xmx68m -cp config;./lib/* l2s.authserver.AuthServer
 if ERRORLEVEL 2 goto restart
 if ERRORLEVEL 1 goto error
 goto end

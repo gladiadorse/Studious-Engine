@@ -5,7 +5,7 @@ title L2-Scripts Classic: Saviors (Zaken) (Game Server)
 echo Starting GameServer.
 echo.
 
-java -server -Dfile.encoding=UTF-8 -XX:+UseConcMarkSweepGC -Xms2g -Xmx5g -cp config;./lib/* l2s.gameserver.GameServer
+java -server -Dfile.encoding=UTF-8 -XX:+UseConcMarkSweepGC -Xms1g -Xmx2g -cp config;./lib/* l2s.gameserver.GameServer
 
 if ERRORLEVEL 2 goto restart
 if ERRORLEVEL 1 goto error
