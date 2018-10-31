@@ -4,21 +4,26 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.apache.log4j.Logger;
+
 import l2s.commons.annotations.Nullable;
-import l2s.commons.map.hash.TIntStringHashMap;
 import l2s.commons.util.Rnd;
 import l2s.gameserver.data.htm.HtmTemplates;
 import l2s.gameserver.model.reward.RewardList;
 
 public class Util
 {
+	protected static final Logger LOGGER = Logger.getLogger(Util.class);
+	
 	static final String PATTERN = "0.0000000000E00";
 	static final DecimalFormat df;
 
@@ -357,5 +362,154 @@ public class Util
 			if(objectInArray != null && objectInArray.equals(objectToLookFor))
 				return true;
 		return false;
-	}		
+	}
+	
+	/**
+	 * @param s
+	 */
+	
+	public static void printSection(String s)
+	{
+		final int maxlength = 79;
+		s = "-[ " + s + " ]";
+		final int slen = s.length();
+		if (slen > maxlength)
+		{
+			LOGGER.info(s);
+			return;
+		}
+		int i;
+		for (i = 0; i < maxlength - slen; i++)
+		{
+			s = "=" + s;
+		}
+		LOGGER.info(s);
+	}
+	
+	/**
+	 * returns how many processors are installed on this system.
+	 */
+	private static void printCpuInfo()
+	{
+		LOGGER.info("Avaible CPU(s): " + Runtime.getRuntime().availableProcessors());
+		LOGGER.info("Processor(s) Identifier: " + System.getenv("PROCESSOR_IDENTIFIER"));
+		LOGGER.info("..................................................");
+		LOGGER.info("..................................................");
+	}
+	
+	/**
+	 * returns the operational system server is running on it.
+	 */
+	private static void printOSInfo()
+	{
+		LOGGER.info("OS: " + System.getProperty("os.name") + " Build: " + System.getProperty("os.version"));
+		LOGGER.info("OS Arch: " + System.getProperty("os.arch"));
+		LOGGER.info("..................................................");
+		LOGGER.info("..................................................");
+	}
+	
+	/**
+	 * returns JAVA Runtime Enviroment properties
+	 */
+	private static void printJreInfo()
+	{
+		LOGGER.info("Java Platform Information");
+		LOGGER.info("Java Runtime  Name: " + System.getProperty("java.runtime.name"));
+		LOGGER.info("Java Version: " + System.getProperty("java.version"));
+		LOGGER.info("Java Class Version: " + System.getProperty("java.class.version"));
+		LOGGER.info("..................................................");
+		LOGGER.info("..................................................");
+	}
+	
+	/**
+	 * returns general infos related to machine
+	 */
+	private static void printRuntimeInfo()
+	{
+		LOGGER.info("Runtime Information");
+		LOGGER.info("Current Free Heap Size: " + Runtime.getRuntime().freeMemory() / 1024 / 1024 + " mb");
+		LOGGER.info("Current Heap Size: " + Runtime.getRuntime().totalMemory() / 1024 / 1024 + " mb");
+		LOGGER.info("Maximum Heap Size: " + Runtime.getRuntime().maxMemory() / 1024 / 1024 + " mb");
+		LOGGER.info("..................................................");
+		LOGGER.info("..................................................");
+		
+	}
+	
+	/**
+	 * calls time service to get system time.
+	 */
+	private static void printSystemTime()
+	{
+		// instanciates Date Objec
+		final Date dateInfo = new Date();
+		
+		// generates a simple date format
+		final SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss aa");
+		
+		// generates String that will get the formater info with values
+		final String dayInfo = df.format(dateInfo);
+		
+		LOGGER.info("..................................................");
+		LOGGER.info("System Time: " + dayInfo);
+		LOGGER.info("..................................................");
+	}
+	
+	/**
+	 * gets system JVM properties.
+	 */
+	private static void printJvmInfo()
+	{
+		LOGGER.info("Virtual Machine Information (JVM)");
+		LOGGER.info("JVM Name: " + System.getProperty("java.vm.name"));
+		LOGGER.info("JVM installation directory: " + System.getProperty("java.home"));
+		LOGGER.info("JVM version: " + System.getProperty("java.vm.version"));
+		LOGGER.info("JVM Vendor: " + System.getProperty("java.vm.vendor"));
+		LOGGER.info("JVM Info: " + System.getProperty("java.vm.info"));
+		LOGGER.info("..................................................");
+		LOGGER.info("..................................................");
+	}
+	
+	/**
+	 * prints all other methods.
+	 */
+	public static void printGeneralSystemInfo()
+	{
+		printSystemTime();
+		printOSInfo();
+		printCpuInfo();
+		printRuntimeInfo();
+		printJreInfo();
+		printJvmInfo();
+	}
+	
+	/**
+	 * converts a given time from minutes -> miliseconds
+	 * @param minutesToConvert
+	 * @return
+	 */
+	public static int convertMinutesToMiliseconds(final int minutesToConvert)
+	{
+		return minutesToConvert * 60000;
+	}
+	
+	public static int getAvailableProcessors()
+	{
+		final Runtime rt = Runtime.getRuntime();
+		return rt.availableProcessors();
+	}
+	
+	public static String getOSName()
+	{
+		return System.getProperty("os.name");
+	}
+	
+	public static String getOSVersion()
+	{
+		return System.getProperty("os.version");
+	}
+	
+	public static String getOSArch()
+	{
+		return System.getProperty("os.arch");
+	}
 }

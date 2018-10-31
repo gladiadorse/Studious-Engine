@@ -50,7 +50,7 @@ public class JoinedIterator<E> implements Iterator<E>
 
 	// the last used iterator
 	private Iterator<E> _lastUsedIterator;
-
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public JoinedIterator(List<Iterator<E>> iterators)
 	{

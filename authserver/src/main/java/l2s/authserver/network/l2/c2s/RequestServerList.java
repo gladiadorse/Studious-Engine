@@ -22,14 +22,12 @@ public class RequestServerList extends L2LoginClientPacket
 {
 	private int _loginOkID1;
 	private int _loginOkID2;
-	private int _unk;
-
 	@Override
 	protected void readImpl()
 	{
 		_loginOkID1 = readD();
 		_loginOkID2 = readD();
-		_unk = readC();
+		readC();
 	}
 
 	@Override

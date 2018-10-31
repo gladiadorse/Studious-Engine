@@ -1376,7 +1376,7 @@
 	</skill>
 	<skill id="2099" levels="1" name="Escape (5-minute)">
 		<set name="icon" value="icon.skill0000"/>
-		<set name="hitTime" value="300000"/>
+		<set name="hitTime" value="10000"/>
 		<set name="olympiad_use" value="false"/>
 		<set name="ride_state" value="NONE;STRIDER;WYVERN;WOLF"/>
 		<set name="magicLevel" value="1"/>

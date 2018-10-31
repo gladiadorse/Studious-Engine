@@ -50,7 +50,6 @@ public final class ServerList extends L2LoginServerPacket
 		int serverId;
 		InetAddress ip;
 		int port;
-		int online;
 		int maxPlayers;
 		boolean status;
 		boolean pvp;
@@ -68,7 +67,6 @@ public final class ServerList extends L2LoginServerPacket
 			this.pvp = pvp;
 			this.brackets = brackets;
 			this.type = type;
-			this.online = online;
 			this.maxPlayers = maxPlayers;
 			this.status = status;
 			this.playerSize = size;

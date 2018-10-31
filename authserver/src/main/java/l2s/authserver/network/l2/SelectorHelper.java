@@ -10,7 +10,6 @@ import l2s.commons.net.nio.impl.IAcceptFilter;
 import l2s.commons.net.nio.impl.IClientFactory;
 import l2s.commons.net.nio.impl.IMMOExecutor;
 import l2s.commons.net.nio.impl.MMOConnection;
-import l2s.commons.threading.RunnableImpl;
 
 
 public class SelectorHelper implements IMMOExecutor<L2LoginClient>, IClientFactory<L2LoginClient>, IAcceptFilter

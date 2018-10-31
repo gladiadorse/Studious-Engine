@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+
+import javolution.util.FastMap;
 
 import l2s.commons.collections.LazyArrayList;
 import l2s.gameserver.Config;
@@ -50,6 +53,10 @@ public class World
 	private static final int REGIONS_X = (MAP_MAX_X >> SHIFT_BY) + OFFSET_X;
 	private static final int REGIONS_Y = (MAP_MAX_Y >> SHIFT_BY) + OFFSET_Y;
 	private static final int REGIONS_Z = (MAP_MAX_Z >> SHIFT_BY_Z) + OFFSET_Z;
+	
+	private static World _instance = null;
+	/** HashMap(String Player name, L2PcInstance) containing all the players in game. */
+	private static Map<String, Player> _allPlayers = new FastMap<String, Player>().shared();
 
 	private static volatile WorldRegion[][][] _worldRegions = new WorldRegion[REGIONS_X + 1][REGIONS_Y + 1][REGIONS_Z + 1];
 
@@ -61,6 +68,68 @@ public class World
 	private static WorldRegion[][][] getRegions()
 	{
 		return _worldRegions;
+	}
+	
+	/**
+	 * Gets the single instance of L2World.
+	 * @return the current instance of L2World.
+	 */
+	public static World getInstance()
+	{
+		if (_instance == null)
+		{
+			_instance = new World();
+		}
+		return _instance;
+	}
+	
+	/**
+	 * Return a collection containing all players in game.<BR>
+	 * <BR>
+	 * <FONT COLOR=#FF0000><B> <U>Caution</U> : Read-only, please! </B></FONT><BR>
+	 * <BR>
+	 * @return the all players
+	 */
+	public Collection<Player> getAllPlayers()
+	{
+		return _allPlayers.values();
+	}
+	
+	/**
+	 * Return how many players are online.<BR>
+	 * <BR>
+	 * @return number of online players.
+	 */
+	public static Integer getAllPlayersCount()
+	{
+		return _allPlayers.size();
+	}
+	
+	/**
+	 * Return the player instance corresponding to the given name.
+	 * @param name Name of the player to get Instance
+	 * @return the player
+	 */
+	public Player getPlayer1(final String name)
+	{
+		return _allPlayers.get(name.toLowerCase());
+	}
+	
+	/**
+	 * Gets the player.
+	 * @param playerObjId the player obj id
+	 * @return the player
+	 */
+	public Player getPlayer1(final int playerObjId)
+	{
+		for (final Player actual : _allPlayers.values())
+		{
+			if (actual.getObjectId() == playerObjId)
+			{
+				return actual;
+			}
+		}
+		return null;
 	}
 
 	private static int validX(int x)

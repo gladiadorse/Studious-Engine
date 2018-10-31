@@ -9,14 +9,9 @@ import java.util.concurrent.locks.ReentrantLock;
 import l2s.authserver.Config;
 import l2s.authserver.ThreadPoolManager;
 import l2s.authserver.network.l2.SessionKey;
-import l2s.commons.threading.RunnableImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SessionManager
 {
-	private static final Logger _log = LoggerFactory.getLogger(SessionManager.class);
-
 	private static final SessionManager _instance = new SessionManager();
 
 	public static final SessionManager getInstance()
@@ -53,7 +48,7 @@ public class SessionManager
 		}
 	}
 
-	/** Карта текущих сессий **/
+	/** Map of current sessions **/
 	private final Map<SessionKey, Session> sessions = new HashMap<SessionKey, Session>();
 	private final Lock lock = new ReentrantLock();
 
@@ -64,7 +59,7 @@ public class SessionManager
 			lock.lock();
 			try
 			{
-				//Чистка просроченных сессий
+				//Cleaning Overdue Sessions
 				long currentMillis = System.currentTimeMillis();
 				Session session;
 				for(Iterator<Session> itr = sessions.values().iterator(); itr.hasNext();)

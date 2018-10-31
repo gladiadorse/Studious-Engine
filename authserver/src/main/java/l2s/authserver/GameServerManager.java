@@ -1,8 +1,5 @@
 package l2s.authserver;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -11,12 +8,10 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import l2s.authserver.database.DatabaseFactory;
-import l2s.authserver.network.gamecomm.GameServer;
-import l2s.commons.dbutils.DbUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import l2s.authserver.network.gamecomm.GameServer;
 
 public class GameServerManager
 {
@@ -74,9 +69,9 @@ public class GameServerManager
 	}
 
 	/**
-	 * Поулчить массив всех зарегистрированных игровых серверов
+	 * Get an array of all registered game servers
 	 * 
-	 * @return массив всех игровых серверов
+	 * @return array of all game servers
 	 */
 	public GameServer[] getGameServers()
 	{
@@ -93,10 +88,10 @@ public class GameServerManager
 	}
 
 	/**
-	 * Получить зарегистрированный игровой сервер по идентификатору
+	 * Get registered game server by id
 	 * 
-	 * @param id идентификатор игрового сервера
-	 * @return игровой сервер
+	 * @param game server id
+	 * @return game server
 	 */
 	public GameServer getGameServerById(int id)
 	{
@@ -112,11 +107,11 @@ public class GameServerManager
 	}
 
 	/**
-	 * Регистрация игрового сервера на требуемый идентификатор
+	 * Register the game server to the required ID
 	 * 
-	 * @param id требуемый идентификатор игрового сервера
-	 * @param gs игровой сервер
-	 * @return true если игрвоой сервер успешно зарегистрирован
+	 * @param id required id of the game server
+	 * @param gs game server
+	 * @return true if the game server is successfully registered
 	 */
 	public boolean registerGameServer(int id, GameServer gs)
 	{

@@ -22,9 +22,15 @@
  */
 package l2s.commons.dbutils;
 
-import java.io.*;
-import java.sql.*;
-import java.text.SimpleDateFormat;
+import java.io.IOException;
+import java.io.LineNumberReader;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,9 +51,7 @@ public class ScriptRunner
 	private final boolean stopOnError;
 	private final boolean autoCommit;
 
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	private PrintWriter logWriter = null;
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	private PrintWriter errorLogWriter = null;
 
 	private String delimiter = DEFAULT_DELIMITER;
@@ -289,8 +293,6 @@ public class ScriptRunner
 	{
 		return delimiter;
 	}
-
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 
 	private void print(Object o)
 	{

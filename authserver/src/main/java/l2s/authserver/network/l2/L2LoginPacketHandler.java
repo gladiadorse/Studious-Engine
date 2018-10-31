@@ -36,6 +36,10 @@ public final class L2LoginPacketHandler implements IPacketHandler<L2LoginClient>
 				else if(opcode == 0x02)
 					packet = new RequestServerLogin();
 				break;
+		case DISCONNECTED:
+			break;
+		default:
+			break;
 		}
 		return packet;
 	}

@@ -1,15 +1,10 @@
 package l2s.authserver.network.gamecomm;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 
 /**
  * @reworked by Bonux
@@ -58,8 +53,6 @@ public class GameServer
 			return _key;
 		}
 	}
-
-	private static final Logger _log = LoggerFactory.getLogger(GameServer.class);
 
 	private final TIntObjectMap<HostInfo> _hosts = new TIntObjectHashMap<HostInfo>();
 	private int _serverType;

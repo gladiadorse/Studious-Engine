@@ -2,16 +2,15 @@ package l2s.gameserver;
 
 import java.io.File;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
-
 import l2s.commons.lang.StatsUtils;
 import l2s.commons.listener.Listener;
 import l2s.commons.listener.ListenerList;
@@ -57,7 +56,6 @@ import l2s.gameserver.instancemanager.games.MiniGameScoreManager;
 import l2s.gameserver.listener.GameListener;
 import l2s.gameserver.listener.game.OnShutdownListener;
 import l2s.gameserver.listener.game.OnStartListener;
-import l2s.gameserver.model.Player;
 import l2s.gameserver.model.World;
 import l2s.gameserver.model.entity.Hero;
 import l2s.gameserver.model.entity.MonsterRace;
@@ -73,18 +71,18 @@ import l2s.gameserver.tables.EnchantHPBonusTable;
 import l2s.gameserver.tables.FakePlayersTable;
 import l2s.gameserver.taskmanager.AutomaticTasks;
 import l2s.gameserver.taskmanager.ItemsAutoDestroy;
+import l2s.gameserver.utils.Memory;
 import l2s.gameserver.utils.OnlineTxtGenerator;
 import l2s.gameserver.utils.Strings;
 import l2s.gameserver.utils.TradeHelper;
+import l2s.gameserver.utils.Util;
 import l2s.gameserver.utils.velocity.VelocityUtils;
-
 import net.sf.ehcache.CacheManager;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class GameServer
 {
+	
+	
 	public static boolean DEVELOP = false;
 
     public static final String PROJECT_REVISION = "L2s [26360]";
@@ -148,7 +146,6 @@ public class GameServer
 		return _onlineLimit;
 	}
 
-	@SuppressWarnings("unchecked")
 	public GameServer() throws Exception
 	{
 		_instance = this;
@@ -200,51 +197,51 @@ public class GameServer
 		DatabaseFactory.getInstance().getConnection().close();
 
         UpdatesInstaller.checkAndInstall();
-
+		printSection("Database");
 		IdFactory _idFactory = IdFactory.getInstance();
 		if(!_idFactory.isInitialized())
 		{
 			_log.error("Could not read object IDs from DB. Please Check Your Data.");
 			throw new Exception("Could not initialize the ID factory");
 		}
-
+		printSection("Cache");
 		CacheManager.getInstance();
 
 		ThreadPoolManager.getInstance();
 
 		BotCheckManager.loadBotQuestions();
-
+		printSection("Items");
 		HidenItemsDAO.LoadAllHiddenItems();
-
-		CustomHeroDAO.getInstance();
+		ItemsDAO.getInstance();
+        ItemHandler.getInstance();
 
 		HWIDBan.getInstance().load();
 
-        ItemHandler.getInstance();
-
         DailyMissionHandlerHolder.getInstance();
-
+		printSection("Scripting Engines");
 		Scripts.getInstance();
-
+		
+		printSection("Geodata");
 		GeoEngine.load();
 
 		Strings.reload();
-
+		printSection("World");
 		GameTimeController.getInstance();
-
 		World.init();
 
 		Parsers.parseAll();
 
-		ItemsDAO.getInstance();
-
 		CrestCache.getInstance();
 
 		ImagesCache.getInstance();
-
+		
+		printSection("Characters");
 		CharacterDAO.getInstance();
-
+		
+		printSection("Clans");
+		ClanTable.getInstance().checkClans();
 		ClanTable.getInstance();
+		ClanSearchManager.getInstance().load();
 
 		EnchantHPBonusTable.getInstance();
 
@@ -253,7 +250,7 @@ public class GameServer
 		StaticObjectHolder.getInstance().spawnAll();
 
 		RaidBossSpawnManager.getInstance();
-
+		printSection("Scripts");
 		Scripts.getInstance().init();
 
 		Announcements.getInstance();
@@ -265,6 +262,8 @@ public class GameServer
 
 		MonsterRace.getInstance();
 
+		printSection("Olympiad");
+		CustomHeroDAO.getInstance();
 		if(Config.ENABLE_OLYMPIAD)
 		{
 			Olympiad.load();
@@ -284,9 +283,7 @@ public class GameServer
         OnShiftActionHolder.getInstance().log();
 
         AutomaticTasks.init();
-
-		ClanTable.getInstance().checkClans();
-
+		printSection("Event Engine");
 		_log.info("=[Events]=========================================");
 		ResidenceHolder.getInstance().callInit();
 		EventHolder.getInstance().callInit();
@@ -300,16 +297,11 @@ public class GameServer
 
 		MiniGameScoreManager.getInstance();
 
-		ClanSearchManager.getInstance().load();
-
         BotReportManager.getInstance();
 
 		TrainingCampManager.getInstance().init();
 
         Shutdown.getInstance().schedule(Config.RESTART_AT_TIME, Shutdown.RESTART);
-
-		_log.info("GameServer Started");
-		_log.info("Maximum Numbers of Connected Players: " + getOnlineLimit());
 
 		registerSelectorThreads(ports);
 
@@ -335,18 +327,53 @@ public class GameServer
             ThreadPoolManager.getInstance().scheduleAtFixedRate(new OnlineTxtGenerator(), 5000L, Config.ONLINE_GENERATOR_DELAY * 60 * 1000L);
 
 		AuthServerCommunication.getInstance().start();
-
+		
+		Util.printSection("Info");
+		_log.info("Operating System: " + Util.getOSName() + " " + Util.getOSVersion() + " " + Util.getOSArch());
+		_log.info("Available CPUs: " + Util.getAvailableProcessors());
+		_log.info("Maximum Numbers of Connected Players: " + Config.MAXIMUM_ONLINE_USERS);
+		_log.info("GameServer Started, free memory " + Memory.getFreeMemory() + " Mb of " + Memory.getTotalMemory() + " Mb");
+		_log.info("Used memory: " + Memory.getUsedMemory() + " MB");
+		
+		Util.printSection("Java specific");
+		_log.info("JRE name: " + System.getProperty("java.vendor"));
+		_log.info("JRE specification version: " + System.getProperty("java.specification.version"));
+		_log.info("JRE version: " + System.getProperty("java.version"));
+		_log.info("--- Detecting Java Virtual Machine (JVM)");
+		_log.info("JVM installation directory: " + System.getProperty("java.home"));
+		_log.info("JVM Avaible Memory(RAM): " + Runtime.getRuntime().maxMemory() / 1048576 + " MB");
+		_log.info("JVM specification version: " + System.getProperty("java.vm.specification.version"));
+		_log.info("JVM specification vendor: " + System.getProperty("java.vm.specification.vendor"));
+		_log.info("JVM specification name: " + System.getProperty("java.vm.specification.name"));
+		_log.info("JVM implementation version: " + System.getProperty("java.vm.version"));
+		_log.info("JVM implementation vendor: " + System.getProperty("java.vm.vendor"));
+		_log.info("JVM implementation name: " + System.getProperty("java.vm.name"));
+		
+		Util.printSection("Status");
+		System.gc();
+		_log.info("Server Loaded in " + (System.currentTimeMillis() - _serverStartTimeMillis) / 1000 + " seconds");
+		ServerStatus.getInstance();
+		
+		_log.info("GameServer Started");
+		_log.info("Maximum Numbers of Connected Players: " + getOnlineLimit());
+		printSection("Telnet");
 		if(Config.IS_TELNET_ENABLED)
 			statusServer = new TelnetServer();
 		else
 			_log.info("Telnet server is currently disabled.");
 
-		_log.info("=================================================");
+/*		_log.info("=================================================");
         String memUsage = new StringBuilder().append(StatsUtils.getMemUsage()).toString();
 		for(String line : memUsage.split("\n"))
 			_log.info(line);
 
 		_log.info("=================================================");
+	}*/
+	}
+	
+	public static void printSection(String s)
+	{
+		_log.info("------------------------------------------------=[ {} ]", s);
 	}
 
 	public GameServerListenerList getListeners()
@@ -410,32 +437,7 @@ public class GameServer
 		return true;
 	}
 
-    private static boolean checkOpenPort(String ip, int port)
-    {
-        Socket socket = null;
-        try
-        {
-            socket = new Socket();
-            socket.connect(new InetSocketAddress(ip, port), 100);
-        }
-        catch(Exception e)
-        {
-            return false;
-        }
-        finally
-        {
-            try
-            {
-                socket.close();
-            }
-            catch(Exception e)
-            {}
-        }
-
-	    return true;
-    }
-
-	private void registerSelectorThreads(TIntSet ports)
+    private void registerSelectorThreads(TIntSet ports)
 	{
 		final GamePacketHandler gph = new GamePacketHandler();
 

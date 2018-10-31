@@ -67,7 +67,7 @@ public class BasicDataSource implements DataSource
 
 		ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(connectURI, connectionProperties);
 
-		PoolableConnectionFactory poolableConnectionFactory = new PoolableConnectionFactory(connectionFactory, connectionPool, statementPoolFactory, "SELECT 1", false, true);
+		new PoolableConnectionFactory(connectionFactory, connectionPool, statementPoolFactory, "SELECT 1", false, true);
 
 		PoolingDataSource dataSource = new PoolingDataSource(connectionPool);
 

@@ -2,7 +2,6 @@ package l2s.commons.net.nio.impl;
 
 import java.nio.ByteBuffer;
 
-@SuppressWarnings("rawtypes")
 public abstract class MMOClient<T extends MMOConnection<?>>
 {
 	private T _connection;

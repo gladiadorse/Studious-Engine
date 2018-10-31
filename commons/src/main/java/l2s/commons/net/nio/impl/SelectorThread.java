@@ -192,7 +192,7 @@ public class SelectorThread<T extends MMOClient> extends Thread
 						}
 					}
 
-					//не делаем паузы, в случае если были какие-либо операции I/O
+					//don't pause if there were any I / O operations
 					continue;
 				}
 
@@ -309,10 +309,9 @@ public class SelectorThread<T extends MMOClient> extends Thread
 
 				_stats.increaseIncomingBytes(result);
 
-				int i;
-				// читаем из буфера максимум пакетов
-				for(i = 0; this.tryReadPacket2(key, con, buf); i++)
-				{}
+				for (; this.tryReadPacket2(key, con, buf);)
+				{
+				}
 			}
 			else if(result == 0)
 				closeConnectionImpl(con);
@@ -335,13 +334,13 @@ public class SelectorThread<T extends MMOClient> extends Thread
 			return false;
 
 		int pos = buf.position();
-		// проверяем, хватает ли нам байт для чтения заголовка и не пустого тела пакета
+		// check whether we have enough bytes to read the header and not the empty body of the packet
 		if(buf.remaining() > _sc.HEADER_SIZE)
 		{
-			// получаем ожидаемый размер пакета
+			// we get the expected packet size
 			int size = buf.getShort() & 0xffff;
 
-			// проверяем корректность размера
+			// check the correctness of the size
 			if(size <= _sc.HEADER_SIZE || size > _sc.PACKET_SIZE)
 			{
 				_log.error("Incorrect packet size : " + size + "! Client : " + con.getClient() + ". Closing connection.");
@@ -349,17 +348,17 @@ public class SelectorThread<T extends MMOClient> extends Thread
 				return false;
 			}
 
-			//ожидаемый размер тела пакета
+			//expected package body size
 			size -= _sc.HEADER_SIZE;
 
-			// проверяем, хватает ли байт на чтение тела
+			// check whether the byte is enough to read the body
 			if(size <= buf.remaining())
 			{
 				_stats.increaseIncomingPacketsCount();
 				parseClientPacket(getPacketHandler(), buf, size, con);
 				buf.position(pos + size + _sc.HEADER_SIZE);
 
-				// закончили чтение из буфера, почистим
+				// finished reading from the buffer, let's clean
 				if(!buf.hasRemaining())
 				{
 					freeBuffer(buf, con);
@@ -369,14 +368,14 @@ public class SelectorThread<T extends MMOClient> extends Thread
 				return true;
 			}
 
-			// не хватает данных на чтение тела пакета, сбрасываем позицию
+			// there is not enough data to read the package body, resetting the position
 			buf.position(pos);
 		}
 
 		if(pos == buf.capacity())
 			_log.warn("Read buffer exhausted for client : " + con.getClient() + ", try to adjust buffer size, current : " + buf.capacity() + ", primary : " + (buf == READ_BUFFER) + ".");
 
-		// не хватает данных, переносим содержимое первичного буфера во вторичный
+		// not enough data, transfer the contents of the primary buffer to the secondary
 		if(buf == READ_BUFFER)
 			allocateReadBuffer(con);
 		else
@@ -453,7 +452,7 @@ public class SelectorThread<T extends MMOClient> extends Thread
 				con.createWriteBuffer(DIRECT_WRITE_BUFFER);
 
 			if(!con.getSendQueue().isEmpty() || con.hasPendingWriteBuffer())
-				// запись не завершена
+				// recording not completed
 				con.scheduleWriteInterest();
 			else
 				con.disableWriteInterest();
@@ -480,7 +479,7 @@ public class SelectorThread<T extends MMOClient> extends Thread
 		WRITE_CLIENT = con.getClient();
 		DIRECT_WRITE_BUFFER.clear();
 
-		if(con.hasPendingWriteBuffer()) // если осталось что-то с прошлого раза
+		if(con.hasPendingWriteBuffer()) // if something remains from the last time
 			con.movePendingWriteBufferTo(DIRECT_WRITE_BUFFER);
 
 		if(DIRECT_WRITE_BUFFER.hasRemaining() && !con.hasPendingWriteBuffer())
@@ -505,12 +504,12 @@ public class SelectorThread<T extends MMOClient> extends Thread
 				try
 				{
 					_stats.increaseOutgoingPacketsCount();
-					putPacketIntoWriteBuffer(sp, true); // записываем пакет в WRITE_BUFFER
+					putPacketIntoWriteBuffer(sp, true); // write the packet to WRITE_BUFFER
 					WRITE_BUFFER.flip();
 					if(DIRECT_WRITE_BUFFER.remaining() >= WRITE_BUFFER.limit())
 						DIRECT_WRITE_BUFFER.put(WRITE_BUFFER);
 					else
-						// если не осталось места в DIRECT_WRITE_BUFFER для WRITE_BUFFER то мы его запишев в следующий раз
+						// if there is no space left in DIRECT_WRITE_BUFFER for WRITE_BUFFER, we will write it down next time
 					{
 						con.createWriteBuffer(WRITE_BUFFER);
 						break;
@@ -613,15 +612,15 @@ public class SelectorThread<T extends MMOClient> extends Thread
 			{
 				try
 				{
-					// очистить буферы
+					// clear buffers
 					con.releaseBuffers();
-					// очистим очереди
+					// clear the queues
 					con.clearQueues();
-					// обнуляем соединение у клиента
+					// reset the client connection
 					con.getClient().setConnection(null);
-					// обнуляем соединение у ключа
+					// reset the connection at the key
 					con.getSelectionKey().attach(null);
-					// отменяем ключ
+					// cancel key
 					con.getSelectionKey().cancel();
 				}
 				finally

@@ -4,14 +4,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import l2s.authserver.Config;
 import l2s.authserver.database.DatabaseFactory;
-import l2s.authserver.network.l2.L2LoginClient;
 import l2s.authserver.network.gamecomm.ReceivablePacket;
 import l2s.authserver.network.gamecomm.as2gs.ChangePasswordResponse;
 import l2s.commons.dbutils.DbUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ChangePassword extends ReceivablePacket
 {
