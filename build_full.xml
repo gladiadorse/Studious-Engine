@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="L2-Scripts-Classic" default="dist" basedir=".">
+<project name="L2-Studious Engine Classic" default="dist" basedir=".">
 
 	<property name="build.version" value="1.0" />
 
@@ -204,7 +204,7 @@
 	
 	<target name="dist" depends="authserver, gameserver">
 		
-		<zip destfile="${build}/L2-Scripts(Classic)_dist.zip" basedir="${build.dist}" />
+		<zip destfile="${build}/L2-Studious Engine(Classic).zip" basedir="${build.dist}" />
 		
 	</target>
 </project>
